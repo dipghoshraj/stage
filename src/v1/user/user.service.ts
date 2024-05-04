@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {UserResponse} from './dto/response/user.response.dto'
 import * as bcrypt from 'bcrypt';
 import {LoginUserDto} from './dto/input/login-user.dto'
-
+import { AddTOListDto} from './dto/input/add-list.dto'
 @Injectable()
 export class UserService {
   constructor(
@@ -66,8 +66,51 @@ export class UserService {
   }
 
 
-  async AddtoListAsync(){
-    
+  async AddtoListAsync(addToListDto: AddTOListDto){
+
+    const type = addToListDto.contentType
+    if (type === 'Movie'){
+
+      const data: Prisma.MyMoviesCreateInput = {
+        movie: {
+          connect: {
+            id: addToListDto.contentId
+          }
+        }
+      }
+
+      const include: Prisma.MyMoviesInclude = {
+        movie: true
+      }
+
+
+      const myMovies = await this.prisma.myMovies.create({
+        data,
+        include
+      })
+
+      return myMovies
+    }else{
+
+      const data: Prisma.MyShowsCreateInput = {
+        tvShow: {
+          connect: {
+            id: addToListDto.contentId
+          }
+        }
+      }
+
+      const include: Prisma.MyShowsInclude = {
+        tvShow: true
+      }
+
+
+      const myShows = await this.prisma.myShows.create({
+        data,
+        include
+      })
+      return myShows
+    }
   }
 
 

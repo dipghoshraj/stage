@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PartialType } from '@nestjs/mapped-types';
 import {IsNotEmpty, IsEmail, Length, Matches, isEmail, IsString, IsArray, IsEnum} from 'class-validator'
 
 type ContectType = "Movie" | "TVShow"
-
-
 
 export class AddTOListDto {
 
