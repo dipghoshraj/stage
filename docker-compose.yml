@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: your_mongodb_password_here
+    command: mongod --bind_ip_all
+    volumes:
+      - .DB/mongodb_data:/data/db
+
+
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --bind 0.0.0.0 --requirepass your_redis_password_here
+    volumes:
+      - .DB/redis_data:/data
