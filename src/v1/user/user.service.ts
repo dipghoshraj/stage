@@ -1,11 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Prisma } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import {UserResponse} from './dto/response/user.response.dto'
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtservice: JwtService
+  ){}
+  
+  async create(createUserDto: CreateUserDto) {
+
+    const data: Prisma.UserCreateInput = {
+      email: createUserDto.email,
+      password: createUserDto.password,
+      mobile: createUserDto.mobile,
+      username: createUserDto.username
+    }
+
+    const select: Prisma.UserSelect= UserResponse.selectUserPrisma();
+    const userData = await this.prisma.user.create({
+      data,
+      select
+    }).catch((error) => {
+      if(error?.message.includes('Unique constraint failed')){
+        throw new ConflictException(`${error?.meta?.target[0]} already exists`);
+      }
+    })
+
+    let access_token = await this.jwtservice.signAsync({uername: createUserDto.mobile})
+    return {...userData, access_token: access_token}
   }
 
   findAll() {

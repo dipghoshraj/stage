@@ -17,7 +17,10 @@ datasource db {
 // schema.prisma
 model User {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  email                             String
+  email                             String            @unique
+  mobile                            String            @unique
+  password                          String
+  username                          String
   preferences                       Preferences[]
   whatchHistory                     WatchHistory[]
 }
