@@ -1,21 +1,6 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: your_mongodb_password_here
-    command: mongod --bind_ip_all
-    volumes:
-      - .database/mongodb_data:/data/db
-
-
-
   redis:
     image: redis
     container_name: redis
@@ -28,5 +13,7 @@ services:
 
 
 volumes:
-  mongodb_data:
   redis_data:
+
+
+# docker run --name mongo -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME="dipghosh" -e MONGO_INITDB_ROOT_PASSWORD="yesthisispassword" -d prismagraphql/mongo-single-replica:5.0.3

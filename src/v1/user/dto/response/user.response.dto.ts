@@ -15,19 +15,19 @@ export class UserResponse {
             username: true,
             mobile: true,
             email: true,
-            preferences: {
-                select: {
-                    id: true,
-                    dislikedGenres: true,
-                    favoriteGenres: true,
-                }
-            },
             whatchHistory:{
                 select: {
                     id: true,
                     contentId: true,
                     watchedOn: true,
                     rating: true,
+                }
+            },
+            prefrance:{
+                select: {
+                    id: true,
+                    favoriteGenres: true,
+                    dislikedGenres: true
                 }
             }
         }

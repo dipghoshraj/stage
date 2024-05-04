@@ -5,6 +5,8 @@ import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {UserResponse} from './dto/response/user.response.dto'
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class UserService {
@@ -14,7 +16,7 @@ export class UserService {
   ){}
   
   async create(createUserDto: CreateUserDto) {
-
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const data: Prisma.UserCreateInput = {
       email: createUserDto.email,
       password: createUserDto.password,
@@ -27,10 +29,13 @@ export class UserService {
       data,
       select
     }).catch((error) => {
+      console.log(error);
       if(error?.message.includes('Unique constraint failed')){
         throw new ConflictException(`${error?.meta?.target[0]} already exists`);
       }
     })
+
+    console.log(userData);
 
     let access_token = await this.jwtservice.signAsync({uername: createUserDto.mobile})
     return {...userData, access_token: access_token}

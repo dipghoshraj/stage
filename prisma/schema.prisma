@@ -21,17 +21,17 @@ model User {
   mobile                            String            @unique
   password                          String
   username                          String
-  preferences                       Preferences[]
+  preferance_id                     String?           @db.ObjectId
+  prefrance                         Preferences?      @relation(fields: [preferance_id], references: [id])  
   whatchHistory                     WatchHistory[]
 }
 
 
 model Preferences {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  userId                            String            @db.ObjectId
-  user                              User              @relation(fields: [userId], references: [id])
   favoriteGenres                    Genre[]
   dislikedGenres                    Genre[]
+  user                              User[]
 }
 
 model WatchHistory {
