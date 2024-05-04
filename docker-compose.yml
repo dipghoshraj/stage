@@ -12,7 +12,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: your_mongodb_password_here
     command: mongod --bind_ip_all
     volumes:
-      - .DB/mongodb_data:/data/db
+      - .database/mongodb_data:/data/db
 
 
 
@@ -24,4 +24,9 @@ services:
       - "6379:6379"
     command: redis-server --bind 0.0.0.0 --requirepass your_redis_password_here
     volumes:
-      - .DB/redis_data:/data
+      - .database/redis_data:/data
+
+
+volumes:
+  mongodb_data:
+  redis_data:
