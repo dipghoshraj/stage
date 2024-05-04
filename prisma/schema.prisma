@@ -27,6 +27,18 @@ model User {
   dislikedGenres                    Genre[]
 }
 
+model MyMovies {
+  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  movie_id                          String            @db.ObjectId
+  movie                             Movie             @relation(fields: [movie_id], references: [id])
+}
+
+model MyShows {
+  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  tvshow_id                         String            @db.ObjectId
+  tvShow                            TVShow            @relation(fields: [tvshow_id], references: [id])
+}
+
 model WatchHistory {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
   user                              User              @relation(fields: [userId], references: [id])
@@ -44,6 +56,7 @@ model Movie {
   releaseDate                       DateTime
   director                          String
   actors                            String[]
+  liked                             MyMovies[]
 }
 
 model TVShow {
@@ -52,6 +65,7 @@ model TVShow {
   description                       String
   genres                            Genre[]
   episodes                          Episode[]
+  liked                             MyShows[]
 }
 
 model Episode {

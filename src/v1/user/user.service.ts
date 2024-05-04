@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/input/create-user.dto';
+import { UpdateUserDto } from './dto/input/update-user.dto';
 import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {UserResponse} from './dto/response/user.response.dto'
 import * as bcrypt from 'bcrypt';
-import {LoginUserDto} from './dto/login-user.dto'
+import {LoginUserDto} from './dto/input/login-user.dto'
 
 @Injectable()
 export class UserService {
@@ -65,19 +65,14 @@ export class UserService {
     throw new UnauthorizedException('User or password wrong')
   }
 
-  findAll() {
-    return `This action returns all user`;
+
+  async AddtoListAsync(){
+    
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }
