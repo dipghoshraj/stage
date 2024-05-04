@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
-import {IsNotEmpty, IsEmail, Length, Matches, isEmail} from 'class-validator'
-
+import {IsNotEmpty, IsEmail, Length, Matches, isEmail, IsString, IsArray, IsEnum} from 'class-validator'
+import { Genre } from '@prisma/client'
 
 
 export class CreateUserDto {
@@ -21,4 +21,15 @@ export class CreateUserDto {
     @ApiProperty()
     @IsEmail({}, {message: 'Please enter valid email address'})
     email: string;
+
+    @ApiProperty()
+    @IsArray()
+    @IsEnum(Genre, { each: true })
+    favoriteGenres: Genre[];
+
+    @ApiProperty()
+    @IsArray()
+    @IsEnum(Genre, { each: true })
+    dislikedGenres: Genre[];
+
 }

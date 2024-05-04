@@ -2,12 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
 import { Prisma } from '@prisma/client';
 
-export class UserResponse {
+
+
+class WatchHistoryResponse {
     id: string
-    username: string
-    mobile: string
-    email: string
-    access_token: string
+    contentId: string
+    watchedOn: Date
+    rating: number
+}
+export class UserResponse {
+    id?: string
+    username?: string
+    mobile?: string
+    email?: string
+    access_token?: string
+    watchHistory?:  WatchHistoryResponse[]
+
+
 
     static selectUserPrisma(): Prisma.UserSelect {
         return {
@@ -15,8 +26,8 @@ export class UserResponse {
             username: true,
             mobile: true,
             email: true,
-            whatchHistory:{
-                select: {
+            watchHistory: {
+                select:{
                     id: true,
                     contentId: true,
                     watchedOn: true,
