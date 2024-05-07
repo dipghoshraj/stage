@@ -23,8 +23,7 @@ export class UserResponse {
     static selectUserPrisma(): Prisma.UserSelect {
         return {
             id: true,
-            username: true,
-            mobile: true,
+             mobile: true,
             email: true,
             watchHistory: {
                 select:{
@@ -34,13 +33,8 @@ export class UserResponse {
                     rating: true,
                 }
             },
-            prefrance:{
-                select: {
-                    id: true,
-                    favoriteGenres: true,
-                    dislikedGenres: true
-                }
-            }
+            favoriteGenres: true,
+            dislikedGenres: true,
         }
     }
 }

@@ -1,13 +1,15 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/input/create-user.dto';
 import { UpdateUserDto } from './dto/input/update-user.dto';
-import { Prisma } from '@prisma/client';
+import { Genre, Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {UserResponse} from './dto/response/user.response.dto'
 import * as bcrypt from 'bcrypt';
 import {LoginUserDto} from './dto/input/login-user.dto'
 import { AddTOListDto} from './dto/input/add-list.dto'
+
+
 @Injectable()
 export class UserService {
   constructor(
@@ -27,19 +29,14 @@ export class UserService {
     }
 
     const select: Prisma.UserSelect= UserResponse.selectUserPrisma();
-    const userData = await this.prisma.user.create({
+    const userData: UserResponse = await this.prisma.user.create({
       data,
       select
-    }).catch((error) => {
-      console.log(error);
-      if(error?.message.includes('Unique constraint failed')){
-        throw new ConflictException(`${error?.meta?.target[0]} already exists`);
-      }
     })
 
     console.log(userData);
 
-    let access_token = await this.jwtservice.signAsync({uername: createUserDto.mobile})
+    let access_token = await this.jwtservice.signAsync({mobile: createUserDto.mobile, userId: userData?.id})
     return {...userData, access_token: access_token}
   }
 
@@ -59,63 +56,42 @@ export class UserService {
     console.log(userData)
 
     if (userData && await bcrypt.compare(loginUserDto.password, userData.password)) {
-      return { ...userData, access_token: await this.jwtservice.signAsync({userName: userData.username})};
+      return { ...userData, access_token: await this.jwtservice.signAsync({mobile: userData.mobile, userId: userData?.id})};
     }
     
     throw new UnauthorizedException('User or password wrong')
   }
 
 
-  async AddtoListAsync(addToListDto: AddTOListDto){
+  async AddtoListAsync(userId: string, addToListDto: AddTOListDto){
 
-    const type = addToListDto.contentType
-    if (type === 'Movie'){
-
-      const data: Prisma.MyMoviesCreateInput = {
-        movie: {
-          connect: {
-            id: addToListDto.contentId
-          }
+    const data: Prisma.FavoriteCreateInput = {
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      Content: {
+        connect: {
+          id: addToListDto.contentId
         }
       }
-
-      const include: Prisma.MyMoviesInclude = {
-        movie: true
-      }
-
-
-      const myMovies = await this.prisma.myMovies.create({
-        data,
-        include
-      })
-
-      return myMovies
-    }else{
-
-      const data: Prisma.MyShowsCreateInput = {
-        tvShow: {
-          connect: {
-            id: addToListDto.contentId
-          }
-        }
-      }
-
-      const include: Prisma.MyShowsInclude = {
-        tvShow: true
-      }
-
-
-      const myShows = await this.prisma.myShows.create({
-        data,
-        include
-      })
-      return myShows
     }
+    const myMovies = await this.prisma.favorite.create({data, include: {Content: true}})
+    return myMovies
   }
 
 
+  async fetchListsandProfile(userId: string){
+    const select: Prisma.UserSelect= UserResponse.selectUserPrisma();
+    const where: Prisma.UserWhereInput = {
+      id: userId
+    }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const userData: UserResponse[] = await this.prisma.user.findMany({
+      select, where
+    })
+
+    return userData
   }
 }
