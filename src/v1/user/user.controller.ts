@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/input/create-user.dto';
 import { UpdateUserDto } from './dto/input/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {LoginUserDto} from './dto/input/login-user.dto'
 import {UserResponse} from './dto/response/user.response.dto'
-
+import {AddTOListDto} from './dto/input/add-list.dto'
+import { AuthGuard } from 'src/guard/auth.gurd';
 @ApiTags('Users')
 @Controller('v1/users')
 export class UserController {
@@ -29,15 +30,19 @@ export class UserController {
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.userService.findOne(+id);
-  // }
+  // 
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+
+  @Post('/add-list') @ApiBearerAuth('access-token') @UseGuards(AuthGuard)
+  async addtoList(@Req() req: any,  @Body() addtoListDto: AddTOListDto) {
+    const userId = req.userId
+    return await this.userService.AddtoListAsync(userId, addtoListDto);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
+
+  @Get('/my-list') @ApiBearerAuth('access-token') @UseGuards(AuthGuard)
+  async myList(@Req() req: any){
+    const userId = req.userId
+    return await this.userService.fetchListsandProfile(userId)
+  }
 }
