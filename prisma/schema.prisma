@@ -22,22 +22,20 @@ model User {
   password                          String
   username                          String
   preferance_id                     String?           @db.ObjectId
-  watchHistory                     WatchHistory[]
+  watchHistory                      WatchHistory[]
   favoriteGenres                    Genre[]
   dislikedGenres                    Genre[]
+  Favorite                          Favorite[]
 }
 
-model MyMovies {
+model Favorite {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  movie_id                          String            @db.ObjectId
-  movie                             Movie             @relation(fields: [movie_id], references: [id])
+  contentId                         String            @db.ObjectId
+  Content                           Content           @relation(fields: [contentId], references: [id])
+  user                              User              @relation(fields: [userId], references: [id])
+  userId                            String            @db.ObjectId
 }
 
-model MyShows {
-  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  tvshow_id                         String            @db.ObjectId
-  tvShow                            TVShow            @relation(fields: [tvshow_id], references: [id])
-}
 
 model WatchHistory {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
@@ -48,29 +46,48 @@ model WatchHistory {
   rating                            Int?
 }
 
-model Movie {
-  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  title                             String
-  description                       String
-  genres                            Genre[]
-  releaseDate                       DateTime
-  director                          String
-  actors                            String[]
-  liked                             MyMovies[]
+model Director {
+    id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+    name                              String
+    Content                           Content[]
 }
 
-model TVShow {
+model ContentActor {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  content_Id                        String            @db.ObjectId
+  Content                           Content           @relation(fields: [content_Id], references: [id])
+  actor_id                          String            @db.ObjectId
+  actor                             Actor             @relation(fields: [actor_id], references: [id])
+}
+
+model Actor {
+  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                              String
+  contents                          ContentActor[]
+}
+
+model Content {
+  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  releaseDate                       DateTime
+  genres                            Genre[]
+  director_id                       String            @db.ObjectId
+  director                          Director          @relation(fields: [director_id], references: [id])
+  actors                            ContentActor[]                        
+  type                              ContentType
   title                             String
   description                       String
-  genres                            Genre[]
   episodes                          Episode[]
-  liked                             MyShows[]
+  favs                              Favorite[]
+}
+
+enum ContentType {
+  Movie
+  TVShow
 }
 
 model Episode {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-  tvShow                            TVShow            @relation(fields: [tvShowId], references: [id])
+  tvShow                            Content           @relation(fields: [tvShowId], references: [id])
   tvShowId                          String            @db.ObjectId
   episodeNumber                     Int
   seasonNumber                      Int
