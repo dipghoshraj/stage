@@ -5,7 +5,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import {UserService} from './v1/user/user.service';
 import {UserController} from './v1/user/user.controller'
-
+import { FavouritesController} from './v1/favourites/favourites.controller'
+import { FavouritesService} from './v1/favourites/favourites.service'
 @Module({
   imports: [PrismaModule, 
     JwtModule.register({
@@ -14,7 +15,7 @@ import {UserController} from './v1/user/user.controller'
       signOptions: { expiresIn: '3600s' },
     }),
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  controllers: [AppController, UserController, FavouritesController],
+  providers: [AppService, UserService, FavouritesService],
 })
 export class AppModule {}

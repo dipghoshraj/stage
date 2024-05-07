@@ -61,37 +61,4 @@ export class UserService {
     
     throw new UnauthorizedException('User or password wrong')
   }
-
-
-  async AddtoListAsync(userId: string, addToListDto: AddTOListDto){
-
-    const data: Prisma.FavoriteCreateInput = {
-      user: {
-        connect: {
-          id: userId
-        }
-      },
-      Content: {
-        connect: {
-          id: addToListDto.contentId
-        }
-      }
-    }
-    const myMovies = await this.prisma.favorite.create({data, include: {Content: true}})
-    return myMovies
-  }
-
-
-  async fetchListsandProfile(userId: string){
-    const select: Prisma.UserSelect= UserResponse.selectUserPrisma();
-    const where: Prisma.UserWhereInput = {
-      id: userId
-    }
-
-    const userData: UserResponse[] = await this.prisma.user.findMany({
-      select, where
-    })
-
-    return userData
-  }
 }

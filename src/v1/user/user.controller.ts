@@ -31,18 +31,4 @@ export class UserController {
   // findOne(@Param('id') id: string) {
   //   return this.userService.findOne(+id);
   // 
-
-
-  @Post('/add-list') @ApiBearerAuth('access-token') @UseGuards(AuthGuard)
-  async addtoList(@Req() req: any,  @Body() addtoListDto: AddTOListDto) {
-    const userId = req.userId
-    return await this.userService.AddtoListAsync(userId, addtoListDto);
-  }
-
-
-  @Get('/my-list') @ApiBearerAuth('access-token') @UseGuards(AuthGuard)
-  async myList(@Req() req: any){
-    const userId = req.userId
-    return await this.userService.fetchListsandProfile(userId)
-  }
 }
