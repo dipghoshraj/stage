@@ -41,15 +41,16 @@ model WatchHistory {
   id                                String            @id @default(auto()) @map("_id") @db.ObjectId
   user                              User              @relation(fields: [userId], references: [id])
   userId                            String            @db.ObjectId
-  contentId                         String
+  contentId                         String            @db.ObjectId
+  Content                           Content           @relation(fields: [contentId], references: [id])
   watchedOn                         DateTime
   rating                            Int?
 }
 
 model Director {
-    id                                String            @id @default(auto()) @map("_id") @db.ObjectId
-    name                              String
-    Content                           Content[]
+  id                                String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                              String
+  Content                           Content[]
 }
 
 model ContentActor {
@@ -78,6 +79,7 @@ model Content {
   description                       String
   episodes                          Episode[]
   favs                              Favorite[]
+  watchs                            WatchHistory[]
 }
 
 enum ContentType {
@@ -91,9 +93,6 @@ model Episode {
   tvShowId                          String            @db.ObjectId
   episodeNumber                     Int
   seasonNumber                      Int
-  releaseDate                       DateTime
-  director                          String
-  actors                            String[]
 }
 
 enum Genre {
