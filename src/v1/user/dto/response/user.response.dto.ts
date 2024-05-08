@@ -23,7 +23,7 @@ export class UserResponse {
     static selectUserPrisma(): Prisma.UserSelect {
         return {
             id: true,
-             mobile: true,
+            mobile: true,
             email: true,
             watchHistory: {
                 select:{

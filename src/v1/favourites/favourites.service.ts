@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponse } from '../user/dto/response/user.response.dto';
 import { FetchFavouriteDto} from './dto/fetch-favourites.dto';
+import { FavouritesResponse} from './dto/response/favourite.response.dto'
 @Injectable()
 export class FavouritesService {
   constructor(
@@ -47,20 +48,62 @@ export class FavouritesService {
       userId: userId
     }
 
+    const select: Prisma.FavoriteSelect = {
+      id: true,
+      Content: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          description: true,
+          episodes:{
+            select: {
+              id: true,
+              episodeNumber: true,
+              seasonNumber: true,
+            }
+          },
+          director: {
+            select: {
+              name: true,
+            }
+          },
+          actors: {
+            select: {
+              actor: {
+                select: {name: true}
+              }
+            }
+          }
+        }
+      }
+    }
+
     if (lastdoc) where.id = {
       gt: lastdoc
     }
 
-    console.log(where)
-
-    const favCOntents =  await this.prisma.favorite.findMany({where, take: limit});
+    console.log(where, fetchFavouriteDto)
+    const favCOntents =  await this.prisma.favorite.findMany({select, where, take: limit});
     let lastContentId;
 
     if (favCOntents.length > 0) {
       lastContentId = favCOntents[favCOntents.length - 1].id;
     }
-    
-    return {contents: favCOntents, lastDoc: lastContentId}
+    const fav = favCOntents.map(content => FavouritesResponse.fromMap(content))
+    return {contents: fav, lastDoc: lastContentId}
+  }
+
+
+  async deleteFavourites(userId: string, favid: string){
+
+    const where: Prisma.FavoriteWhereUniqueInput = {id: favid, userId: userId}
+
+    const deleteDoc = await this.prisma.favorite.delete({
+      where
+    })
+
+    return deleteDoc
   }
 
 

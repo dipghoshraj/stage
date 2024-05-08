@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, Query } from '@nestjs/common';
 import { FavouritesService } from './favourites.service';
 import { CreateFavouriteDto } from './dto/create-favourite.dto';
 import { UpdateFavouriteDto } from './dto/update-favourite.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/guard/auth.gurd';
 
 import { FetchFavouriteDto} from './dto/fetch-favourites.dto';
@@ -19,19 +19,19 @@ export class FavouritesController {
     return this.favouritesService.AddtoListAsync(userId, createFavouriteDto);
   }
 
-  @Get()  @ApiBearerAuth('access-token') @UseGuards(AuthGuard)
-  findAll(@Req() req: any, @Param() fetchFavouriteDto: FetchFavouriteDto) {
+  @Get()  @ApiBearerAuth('access-token') @UseGuards(AuthGuard)  
+  findAll(@Req() req: any, @Query() fetchFavouriteDto: FetchFavouriteDto) {
     const userId = req.userId
     if(!userId){
       throw new UnauthorizedException();
     }
-    console.log(userId);
+    console.log(fetchFavouriteDto)
     return this.favouritesService.fetchListsandProfile(userId, fetchFavouriteDto);
   }
 
   @Delete(':id')
   remove(@Req() req: any, @Param('id') id: string) {
     const userId = req.userId
-    return this.favouritesService.remove(+id);
+    return this.favouritesService.deleteFavourites(userId, id);
   }
 }

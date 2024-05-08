@@ -3,7 +3,7 @@ import {IsNotEmpty, IsEmail, Length, Matches, isEmail, IsString, IsArray, IsEnum
 
 export class FetchFavouriteDto {
     
-    @ApiProperty()
+    @ApiProperty({required: false})
     @IsString()
     @IsOptional()
     lastDoc: string;
