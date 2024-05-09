@@ -1,8 +1,10 @@
 const { PrismaClient, Genre, ContentType } = require('@prisma/client');
-
+const {ElasticSearchService} =  require('../../src/elastic-search/elastic-search.service.ts')
 async function seedFavs() {
 
     const prisma = new PrismaClient();
+    const elasticService =  new ElasticSearchService()
+
     const content = await prisma.content.findMany({where:{
         type: ContentType.TVShow,
     }, take: 50})
@@ -11,20 +13,6 @@ async function seedFavs() {
     console.log(ids)
 
     for(const id of  ids){
-        await prisma.favorite.create({
-            data: {
-                Content: {
-                    connect:{
-                        id: id
-                    }
-                },
-                user: {
-                    connect:{
-                        id: '663a85d3634e2c34fb0ed0a3'
-                    }
-                }
-            }
-        })
     }
 }
 

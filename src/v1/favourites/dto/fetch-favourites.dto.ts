@@ -3,9 +3,12 @@ import {IsNotEmpty, IsEmail, Length, Matches, isEmail, IsString, IsArray, IsEnum
 
 export class FetchFavouriteDto {
     
-    @ApiProperty({required: false})
-    @IsString()
-    @IsOptional()
-    lastDoc: string;
+    @ApiProperty()
+    @IsNumber()
+    page: number
+
+    @ApiProperty()
+    @IsNumber()
+    limit: number
 
 }

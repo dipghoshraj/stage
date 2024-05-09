@@ -6,19 +6,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponse } from '../user/dto/response/user.response.dto';
 import { FetchFavouriteDto} from './dto/fetch-favourites.dto';
 import { FavouritesResponse} from './dto/response/favourite.response.dto'
+import {ElasticSearchService} from 'src/elastic-search/elastic-search.service'
 @Injectable()
 export class FavouritesService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly elasticSearchService: ElasticSearchService
+
   ){}
-
-  findAll() {
-    return `This action returns all favourites`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} favourite`;
-  }
 
   async AddtoListAsync(userId: string, createFavouriteDto: CreateFavouriteDto){
 
@@ -35,21 +30,46 @@ export class FavouritesService {
       }
     }
     const myMovies = await this.prisma.favorite.create({data, include: {Content: true}})
+    this.syncToes(myMovies.id)
     return myMovies
   }
 
 
-  async fetchListsandProfile(userId: string, fetchFavouriteDto: FetchFavouriteDto){
-    const limit = 10;
-    const lastdoc =  fetchFavouriteDto.lastDoc
-
-
-    const where: Prisma.FavoriteWhereInput = {
-      userId: userId
+  async fetchWithEs(userId: string, fetchFavouriteDto: FetchFavouriteDto){
+    const query =  {
+      query: {
+        match: {
+          userId: userId
+        }
+      }
     }
+    const response = await this.elasticSearchService.searchDocuments( 'favourites',query, fetchFavouriteDto.page, fetchFavouriteDto.limit);
+    const hists =  response.hits.hits?.map(hit => hit._source)
+    return hists;
+  }
 
+
+  async deleteFavourites(userId: string, favid: string){
+    const where: Prisma.FavoriteWhereUniqueInput = {id: favid, userId: userId}
+    const deleteDoc = await this.prisma.favorite.delete({
+      where
+    })
+    await this.elasticSearchService.deleteDocument('favourites', favid)
+    return deleteDoc
+  }
+
+
+  async syncToes(favoriteId: string){
+
+    const body = await this.singleFavorite(favoriteId)
+    await this.elasticSearchService.indexFavDocument('favourites', body)
+  }
+
+
+  async singleFavorite(favid: string){
     const select: Prisma.FavoriteSelect = {
       id: true,
+      userId: true,
       Content: {
         select: {
           id: true,
@@ -79,31 +99,12 @@ export class FavouritesService {
       }
     }
 
-    if (lastdoc) where.id = {
-      gt: lastdoc
+    const where: Prisma.FavoriteWhereInput = {
+      id: favid
     }
 
-    console.log(where, fetchFavouriteDto)
-    const favCOntents =  await this.prisma.favorite.findMany({select, where, take: limit});
-    let lastContentId;
-
-    if (favCOntents.length > 0) {
-      lastContentId = favCOntents[favCOntents.length - 1].id;
-    }
-    const fav = favCOntents.map(content => FavouritesResponse.fromMap(content))
-    return {contents: fav, lastDoc: lastContentId}
-  }
-
-
-  async deleteFavourites(userId: string, favid: string){
-
-    const where: Prisma.FavoriteWhereUniqueInput = {id: favid, userId: userId}
-
-    const deleteDoc = await this.prisma.favorite.delete({
-      where
-    })
-
-    return deleteDoc
+    const favCOntents =  await this.prisma.favorite.findFirst({select, where})
+    return FavouritesResponse.fromMap(favCOntents)
   }
 
 

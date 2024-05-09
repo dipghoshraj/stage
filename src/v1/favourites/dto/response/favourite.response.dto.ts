@@ -42,11 +42,13 @@ export class FavouritesResponse {
 
     id: string;
     content: Content
+    userId: string
 
     static fromMap(data: any): FavouritesResponse {
         const response = new FavouritesResponse();
         // console.log(data);
         response.id = data.id;
+        response.userId = data.userId;
         response.content = Content.fromMap(data.Content) 
         return response;
     }

@@ -7,6 +7,7 @@ import {UserService} from './v1/user/user.service';
 import {UserController} from './v1/user/user.controller'
 import { FavouritesController} from './v1/favourites/favourites.controller'
 import { FavouritesService} from './v1/favourites/favourites.service'
+import { ElasticSearchService } from './elastic-search/elastic-search.service';
 @Module({
   imports: [PrismaModule, 
     JwtModule.register({
@@ -16,6 +17,6 @@ import { FavouritesService} from './v1/favourites/favourites.service'
     }),
   ],
   controllers: [AppController, UserController, FavouritesController],
-  providers: [AppService, UserService, FavouritesService],
+  providers: [AppService, UserService, FavouritesService, ElasticSearchService],
 })
 export class AppModule {}

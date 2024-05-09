@@ -26,7 +26,7 @@ export class FavouritesController {
       throw new UnauthorizedException();
     }
     console.log(fetchFavouriteDto)
-    return this.favouritesService.fetchListsandProfile(userId, fetchFavouriteDto);
+    return this.favouritesService.fetchWithEs(userId, fetchFavouriteDto);
   }
 
   @Delete(':id')
